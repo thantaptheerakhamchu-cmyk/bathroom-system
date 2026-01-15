@@ -1,52 +1,28 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <title>ระบบจัดการห้องน้ำ - แผนกไอที</title>
-    <style>
-        body { font-family: sans-serif; background: #f0f2f5; text-align: center; }
-        .container { display: flex; justify-content: center; gap: 20px; padding: 20px; }
-        .toilet-card { background: white; border-radius: 15px; width: 250px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .status-dot { height: 15px; width: 15px; border-radius: 50%; display: inline-block; }
-        .green { background-color: #2ecc71; } /* สะอาด */
-        .red { background-color: #e74c3c; }   /* สกปรก */
-        .equipment { text-align: left; font-size: 0.9em; color: #555; }
-        h1 { color: #2c3e50; }
-        button { background: #3498db; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <h1>🚽 ระบบจัดการห้องน้ำในแผนก</h1>
-    <div class="container">
-        <div class="toilet-card">
-            <h3>ห้องน้ำ 1</h3>
-            <p><span class="status-dot green"></span> สถานะ: สะอาด</p>
-            <div class="equipment">
-                <p>✅ ถังน้ำ / ขันน้ำ</p>
-                <p>✅ สายชำระ</p>
-            </div>
-            <button onclick="alert('ขอบคุณที่แจ้งรายงาน!')">รายงานปัญหา</button>
-        </div>
-
-        <div class="toilet-card">
-            <h3>ห้องน้ำ 2</h3>
-            <p><span class="status-dot red"></span> สถานะ: สกปรก</p>
-            <div class="equipment">
-                <p>❌ ถังน้ำ / ขันน้ำ</p>
-                <p>✅ สายชำระ</p>
-            </div>
-            <button onclick="alert('ส่งข้อมูลให้แม่บ้านแล้ว!')">แจ้งทำความสะอาด</button>
-        </div>
-
-        <div class="toilet-card">
-            <h3>ห้องน้ำ 3</h3>
-            <p><span class="status-dot red"></span> สถานะ: สกปรก</p>
-            <div class="equipment">
-                <p>❌ ถังน้ำ / ขันน้ำ</p>
-                <p>✅ สายชำระ</p>
-            </div>
-            <button onclick="alert('ส่งข้อมูลให้แม่บ้านแล้ว!')">แจ้งทำความสะอาด</button>
-        </div>
+<div class="toilet-card">
+    <h3>ห้องน้ำ 2</h3>
+    <p><span class="status-dot red"></span> สถานะ: สกปรก</p>
+    <div class="equipment">
+        <p>❌ ถังน้ำ / ขันน้ำ</p>
+        <p>✅ สายชำระ</p>
     </div>
-</body>
-</html>
+
+    <p style="font-size: 0.8em; text-align: left; margin-bottom: 5px;">ระบุปัญหาที่พบ:</p>
+    <select id="issue-select-2" style="width: 100%; margin-bottom: 10px; padding: 5px;">
+        <option value="ความสะอาด">ความสะอาด/พื้นเปียก</option>
+        <option value="ถังน้ำ/ขันน้ำ">ถังน้ำ/ขันน้ำ (ชำรุด/ไม่มี)</option>
+        <option value="สายชำระ">สายชำระ (รั่ว/พัง)</option>
+        <option value="อื่นๆ">อื่นๆ</option>
+    </select>
+
+    <button onclick="reportIssue(2)">ส่งรายงานปัญหา</button>
+</div>
+
+<script>
+function reportIssue(roomNumber) {
+    // ดึงค่าที่เลือกจาก select ของห้องนั้นๆ
+    var selectedIssue = document.getElementById('issue-select-' + roomNumber).value;
+    
+    // จำลองการทำงาน (ในระบบจริงส่วนนี้จะส่งค่าไปให้ Python)
+    alert('ระบบได้รับรายงานห้องที่ ' + roomNumber + '\nปัญหาที่พบ: ' + selectedIssue + '\nกำลังส่งข้อมูลให้แม่บ้าน...');
+}
+</script>
