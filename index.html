@@ -94,8 +94,36 @@
             
             if(note) { message += "\nรายละเอียด: " + note; }
             
-            alert(message + "\n\nระบบกำลังส่งข้อมูลไปยัง Backend (Python)...");
+            alert(message + "\n\nระบบกำลังส่งข้อมูลไปยัง แม่บ้าน...");
         }
+        function sendReport(roomNum) {
+    const issue = document.getElementById('issue-' + roomNum).value;
+    const note = document.getElementById('desc-' + roomNum).value;
+    
+    // ชี้เป้าไปที่เครื่องตัวเอง (Localhost)
+    const url = "http://127.0.0.1:5000/report"; 
+    
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            room: roomNum,
+            issue: issue,
+            note: note
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.status === "success") {
+            alert("✅ " + data.message);
+        } else {
+            alert("❌ ผิดพลาด: " + data.message);
+        }
+    })
+    .catch(error => {
+        alert("❌ ไม่สามารถเชื่อมต่อกับ Python Backend ได้ (อย่าลืมรันไฟล์ app.py นะครับ)");
+    });
+}
     </script>
 </body>
 </html>
