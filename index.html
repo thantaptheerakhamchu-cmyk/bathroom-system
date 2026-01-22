@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจัดการห้องน้ำ - แผนกไอที</title>
+    <title>ระบบจัดการห้องน้ำ</title>
     <style>
-        /* ส่วนเดิมที่คุณชอบ */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; text-align: center; margin: 0; padding: 0; }
         h1 { color: #2c3e50; margin-top: 20px; padding: 0 15px; font-size: 1.8rem; }
-        
         .container { 
-            display: flex; 
+            display: grid; 
+            grid-template-columns: 1fr;
             justify-content: center; 
             gap: 20px; 
             padding: 20px; 
-            flex-wrap: wrap; 
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .toilet-card { 
             background: white; 
             border-radius: 15px; 
-            width: 300px; /* ขนาดมาตรฐานบนคอม */
+            width: 100%; 
             padding: 20px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
             margin-bottom: 10px;
@@ -37,7 +37,6 @@
         .report-section { border-top: 1px solid #eee; padding-top: 15px; text-align: left; }
         label { font-weight: bold; font-size: 0.85em; color: #34495e; }
         
-        /* ปรับขนาดช่องกรอกให้กดง่ายขึ้น */
         select, input { 
             width: 100%; 
             padding: 12px; 
@@ -45,7 +44,7 @@
             border: 1px solid #ddd; 
             border-radius: 8px; 
             box-sizing: border-box; 
-            font-size: 16px; /* ป้องกัน iOS ซูมจอเวลาพิมพ์ */
+            font-size: 16px; 
         }
         
         button { 
@@ -63,26 +62,18 @@
         button:hover { background: #2980b9; }
         button:active { transform: scale(0.98); }
 
-        /* --- ส่วนที่เพิ่มเพื่อรองรับมือถือ (Responsive) --- */
+        /* --- ส่วน Responsive --- */
         @media (min-width: 600px) and (orientation: landscape) {
-        .container {
-            grid-template-columns: repeat(2, 1fr);
+            .container { grid-template-columns: repeat(2, 1fr); }
         }
-    }
 
-    /* 2. เมื่อหน้าจอกว้างขึ้น (เช่น iPad หรือ Tablet แนวตั้ง): ปรับเป็น 2 คอลัมน์ */
-    @media (min-width: 768px) {
-        .container {
-            grid-template-columns: repeat(2, 1fr);
+        @media (min-width: 768px) {
+            .container { grid-template-columns: repeat(2, 1fr); }
         }
-    }
 
-    /* 3. บนหน้าจอคอมพิวเตอร์ (Desktop): กลับมาเป็น 3 คอลัมน์ตามที่คุณชอบ */
-    @media (min-width: 1024px) {
-        .container {
-            grid-template-columns: repeat(3, 1fr);
+        @media (min-width: 1024px) {
+            .container { grid-template-columns: repeat(3, 1fr); }
         }
-    }
     </style>
 </head>
 <body>
@@ -91,7 +82,7 @@
         
         <div class="toilet-card">
             <h3>ห้องน้ำ 1</h3>
-            <p><span class="status-dot green"></span> สถานะ: สะอาด</p>
+            <p><span id="dot-1" class="status-dot green"></span> สถานะ: <span id="text-1">สะอาด</span></p>
             <div class="equipment">
                 <p>✅ ถังน้ำ | ✅ ขันน้ำ | ✅ สายชำระ</p>
             </div>
@@ -110,7 +101,7 @@
 
         <div class="toilet-card">
             <h3>ห้องน้ำ 2</h3>
-            <p><span class="status-dot green"></span> สถานะ: สะอาด</p>
+            <p><span id="dot-2" class="status-dot green"></span> สถานะ: <span id="text-2">สะอาด</span></p>
             <div class="equipment">
                 <p>✅ ถังน้ำ | ✅ ขันน้ำ | ✅ สายชำระ</p>
             </div>
@@ -129,7 +120,7 @@
 
         <div class="toilet-card">
             <h3>ห้องน้ำ 3</h3>
-            <p><span class="status-dot green"></span> สถานะ: สะอาด</p>
+            <p><span id="dot-3" class="status-dot green"></span> สถานะ: <span id="text-3">สะอาด</span></p>
             <div class="equipment">
                 <p>✅ ถังน้ำ | ✅ ขันน้ำ | ✅ สายชำระ</p>
             </div>
@@ -153,7 +144,6 @@
             const issue = document.getElementById('issue-' + roomNum).value;
             const note = document.getElementById('desc-' + roomNum).value;
             
-            // เชื่อมต่อไปยัง Python Backend ในเครื่องคุณ
             const url = "http://127.0.0.1:5000/report"; 
             
             fetch(url, {
@@ -169,6 +159,19 @@
             .then(data => {
                 if(data.status === "success") {
                     alert("✅ " + data.message);
+
+                    // --- ส่วนที่เพิ่มเข้ามา: เปลี่ยนสถานะบนหน้าเว็บทันที ---
+                    if (issue === "ความสะอาด") {
+                        const dot = document.getElementById('dot-' + roomNum);
+                        const statusText = document.getElementById('text-' + roomNum);
+                        
+                        // เปลี่ยนสีจุดจาก green เป็น red
+                        dot.classList.remove('green');
+                        dot.classList.add('red');
+                        
+                        // เปลี่ยนคำว่า "สะอาด" เป็น "ไม่สะอาด"
+                        statusText.innerText = "ไม่สะอาด";
+                    }
                 } else {
                     alert("❌ ผิดพลาด: " + data.message);
                 }
