@@ -140,63 +140,71 @@
     </div>
 
     <script>
-        // --- ส่วนการตั้งค่า URL ---
-        // เมื่อรัน ngrok แล้ว ให้นำ URL ที่ได้ (https://xxx.ngrok-free.app) มาใส่ที่นี่
-        const BASE_URL = " https://tearable-solomon-exalted.ngrok-free.dev"; 
+    // 1. ตรวจสอบลิงก์ ngrok ให้เป็นปัจจุบันเสมอ
+    const BASE_URL = "https://tearable-solomon-exalted.ngrok-free.dev"; 
 
-        function updateUI() {
-            fetch(`${BASE_URL}/get_status`)
-            .then(response => response.json())
-            .then(data => {
-                for (let i = 1; i <= 3; i++) {
-                    const dot = document.getElementById('dot-' + i);
-                    const text = document.getElementById('text-' + i);
-                    if (dot && text) {
-                        dot.className = "status-dot " + data[i].color;
-                        text.innerText = data[i].status;
-                    }
+    // --- ส่วนที่ 1: ดึงสถานะจากสมองส่วนกลาง (Python) ---
+    function updateUI() {
+        fetch(`${BASE_URL}/get_status`, {
+            // เพิ่มบรรทัดนี้เพื่อข้ามหน้า Browser Warning ของ ngrok
+            headers: { "ngrok-skip-browser-warning": "true" } 
+        })
+        .then(response => response.json())
+        .then(data => {
+            for (let i = 1; i <= 3; i++) {
+                const dot = document.getElementById('dot-' + i);
+                const text = document.getElementById('text-' + i);
+                if (dot && text) {
+                    dot.className = "status-dot " + data[i].color;
+                    text.innerText = data[i].status;
                 }
-            })
-            .catch(err => console.log("กำลังรอการเชื่อมต่อจาก Server..."));
-        }
-
-        window.onload = updateUI;
-        setInterval(updateUI, 5000);
-
-        function sendReport(roomNum) {
-            const issue = document.getElementById('issue-' + roomNum).value;
-            const note = document.getElementById('desc-' + roomNum).value;
-            
-            fetch(`${BASE_URL}/report`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ room: roomNum, issue: issue, note: note })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.status === "success") {
-                    alert("✅ " + data.message);
-                    updateUI();
-                } else {
-                    alert("❌ ผิดพลาด: " + data.message);
-                }
-            })
-            .catch(error => {
-                alert("❌ ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่ภายหลัง");
-            });
-        }
-
-        // --- ระบบ Login เจ้าหน้าที่ ---
-        function adminLogin() {
-            const user = prompt("กรุณาใส่ชื่อผู้ใช้งาน:");
-            const pass = prompt("กรุณาใส่รหัสผ่าน:");
-
-            if (user === "admin" && pass === "1234") {
-                window.location.href = "admin.html";
-            } else if (user !== null) { // ป้องกัน alert โชว์ถ้ากด Cancel
-                alert("ข้อมูลไม่ถูกต้อง!");
             }
+        })
+        .catch(err => console.log("กำลังรอการเชื่อมต่อจาก Server..."));
+    }
+
+    window.onload = updateUI;
+    setInterval(updateUI, 5000); // เช็กสถานะทุก 5 วินาที
+
+    // --- ส่วนที่ 2: ฟังก์ชันรายงานปัญหา ---
+    function sendReport(roomNum) {
+        const issue = document.getElementById('issue-' + roomNum).value;
+        const note = document.getElementById('desc-' + roomNum).value;
+        
+        fetch(`${BASE_URL}/report`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                // เพิ่มบรรทัดนี้ด้วยเช่นกันครับ
+                'ngrok-skip-browser-warning': 'true' 
+            },
+            body: JSON.stringify({ room: roomNum, issue: issue, note: note })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === "success") {
+                alert("✅ " + data.message);
+                updateUI(); // สั่งให้อัปเดตสถานะทันทีเมื่อรายงานสำเร็จ
+            } else {
+                alert("❌ ผิดพลาด: " + data.message);
+            }
+        })
+        .catch(error => {
+            alert("❌ ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่ภายหลัง");
+        });
+    }
+
+    // --- ระบบ Login เจ้าหน้าที่ ---
+    function adminLogin() {
+        const user = prompt("กรุณาใส่ชื่อผู้ใช้งาน:");
+        const pass = prompt("กรุณาใส่รหัสผ่าน:");
+
+        if (user === "admin" && pass === "1234") {
+            window.location.href = "admin.html";
+        } else if (user !== null) {
+            alert("ข้อมูลไม่ถูกต้อง!");
         }
-    </script>
+    }
+</script>
 </body>
 </html>
