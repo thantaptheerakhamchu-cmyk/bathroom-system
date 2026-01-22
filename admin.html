@@ -61,7 +61,7 @@
     <script>
         function resetRoom(roomNum) {
             // ส่งคำสั่งไปที่ Route /reset_status ใน Python ของคุณ
-            fetch("http://127.0.0.1:5000/reset_status", {
+            fetch("https://tearable-solomon-exalted.ngrok-free.dev/reset_status", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ room: roomNum })
