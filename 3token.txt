@@ -1,4 +1,4 @@
-chanel secret c7e12914aace4e7560247ba96453d752
-access token 4osdkFfAQlp1ejc0f2FP7bUWPWJK87ilIuTK1CSgWzbMGZzM2050Lm4aEfN+YVjCjyu24VBP/qzzmb1FT/EMxsok+jHdo14Qc6SGUCjMxouWGE9Ql53LtSLDj8EX5y/5vcZ+dwEGNqp325quq+W67wdB04t89/1O/w1cDnyilFU=
+chanel secret 5aa27f0297016a1c747b6e36f3d395fa
+access token YXURNM6OycB38H4910Op/8XbQXM1DXk2WH79awHr24mzilhUpl8dr0G8+ju9ezY+jyu24VBP/qzzmb1FT/EMxsok+jHdo14Qc6SGUCjMxouYWwwH8ICECC/Of7zaqaanbpQ+yAWek4NshzRi5KZopAdB04t89/1O/w1cDnyilFU=
 id Ue245f5522acbdea06115091b2958ab69
 รัน python python bathroom_logic.py
