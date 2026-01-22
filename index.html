@@ -64,19 +64,25 @@
         button:active { transform: scale(0.98); }
 
         /* --- ส่วนที่เพิ่มเพื่อรองรับมือถือ (Responsive) --- */
-        @media (max-width: 600px) {
-            h1 { font-size: 1.4rem; }
-            .container { 
-                flex-direction: column; /* เรียงเป็นแนวตั้ง */
-                align-items: center; 
-                padding: 10px;
-            }
-            .toilet-card { 
-                width: 100%; /* เต็มความกว้างมือถือ */
-                max-width: 380px; 
-                margin-bottom: 15px;
-            }
+        @media (min-width: 600px) and (orientation: landscape) {
+        .container {
+            grid-template-columns: repeat(2, 1fr);
         }
+    }
+
+    /* 2. เมื่อหน้าจอกว้างขึ้น (เช่น iPad หรือ Tablet แนวตั้ง): ปรับเป็น 2 คอลัมน์ */
+    @media (min-width: 768px) {
+        .container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* 3. บนหน้าจอคอมพิวเตอร์ (Desktop): กลับมาเป็น 3 คอลัมน์ตามที่คุณชอบ */
+    @media (min-width: 1024px) {
+        .container {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
     </style>
 </head>
 <body>
