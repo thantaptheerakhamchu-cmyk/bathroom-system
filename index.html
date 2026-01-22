@@ -3,30 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจัดการห้องน้ำ</title>
+    <title>ระบบจัดการห้องน้ำ - วิทยาลัยเทคนิคยะลา</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; text-align: center; margin: 0; padding: 0; }
+        /* สไตล์เดิมของคุณ */
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; text-align: center; margin: 0; padding: 0; }
         h1 { color: #2c3e50; margin-top: 20px; padding: 0 15px; font-size: 1.8rem; }
         
+        /* ปุ่ม Login Admin มุมขวาบน */
+        .admin-btn {
+            position: absolute; top: 10px; right: 10px;
+            background: #95a5a6; color: white; border: none;
+            padding: 8px 12px; border-radius: 5px; cursor: pointer;
+            font-size: 0.8rem; font-weight: bold;
+        }
+
         .container { 
-            display: grid; 
-            grid-template-columns: 1fr;
-            justify-content: center; 
-            gap: 20px; 
-            padding: 20px; 
-            max-width: 1200px;
-            margin: 0 auto;
+            display: grid; grid-template-columns: 1fr;
+            gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto;
         }
 
         .toilet-card { 
-            background: white; 
-            border-radius: 15px; 
-            width: 100%; 
-            padding: 20px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-            margin-bottom: 10px;
-            box-sizing: border-box;
-            transition: transform 0.2s;
+            background: white; border-radius: 15px; width: 100%; 
+            padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            margin-bottom: 10px; box-sizing: border-box;
         }
         
         .status-dot { height: 15px; width: 15px; border-radius: 50%; display: inline-block; margin-right: 5px; }
@@ -34,166 +33,86 @@
         .red { background-color: #e74c3c; }
         
         .equipment { text-align: left; font-size: 0.9em; color: #555; margin-bottom: 15px; background: #fdfdfd; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
-        
         .report-section { border-top: 1px solid #eee; padding-top: 15px; text-align: left; }
-        label { font-weight: bold; font-size: 0.85em; color: #34495e; }
         
-        select, input { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 8px 0; 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            font-size: 16px; 
-        }
-        
-        button { 
-            background: #3498db; 
-            color: white; 
-            border: none; 
-            padding: 14px; 
-            width: 100%; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            margin-top: 10px; 
-            font-weight: bold; 
-            font-size: 1rem;
-        }
-        button:hover { background: #2980b9; }
-        button:active { transform: scale(0.98); }
+        select, input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button.send-btn { background: #3498db; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
-        /* --- ส่วน Responsive --- */
-        @media (min-width: 600px) and (orientation: landscape) {
-            .container { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (min-width: 768px) {
-            .container { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (min-width: 1024px) {
-            .container { grid-template-columns: repeat(3, 1fr); }
-        }
+        /* Responsive Grid */
+        @media (min-width: 768px) { .container { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .container { grid-template-columns: repeat(3, 1fr); } }
     </style>
 </head>
 <body>
+    <button class="admin-btn" onclick="checkAdmin()">สำหรับเจ้าหน้าที่ 🔑</button>
+
     <h1>🚽 ระบบจัดการห้องน้ำ</h1>
+    
     <div class="container">
-        
         <div class="toilet-card">
             <h3>ห้องน้ำ 1</h3>
             <p><span id="dot-1" class="status-dot green"></span> สถานะ: <span id="text-1">สะอาด</span></p>
-            <div class="equipment">
-                <p>✅ ถังน้ำ | ✅ ขันน้ำ | ✅ สายชำระ</p>
-            </div>
+            <div class="equipment">✅ ถังน้ำ | ✅ ขันน้ำ | ✅ สายชำระ</div>
             <div class="report-section">
-                <label>ระบุปัญหาที่พบ:</label>
                 <select id="issue-1">
                     <option value="ความสะอาด/พื้นเปียก">ความสะอาด/พื้นเปียก</option>
-                    <option value="ถังน้ำ/ขันน้ำ">ถังน้ำ/ขันน้ำ (ชำรุด/ไม่มี)</option>
-                    <option value="สายชำระ">สายชำระ (รั่ว/พัง)</option>
-                    <option value="อื่นๆ">อื่นๆ (โปรดระบุข้างล่าง)</option>
+                    <option value="ถังน้ำ/ขันน้ำ">ถังน้ำ/ขันน้ำ</option>
+                    <option value="อื่นๆ">อื่นๆ</option>
                 </select>
-                <input type="text" id="desc-1" placeholder="ระบุรายละเอียดเพิ่มเติม...">
-                <button onclick="sendReport(1)">รายงานปัญหา</button>
+                <input type="text" id="desc-1" placeholder="เพิ่มเติม...">
+                <button class="send-btn" onclick="sendReport(1)">รายงานปัญหา</button>
             </div>
         </div>
-
-        <div class="toilet-card">
-            <h3>ห้องน้ำ 2</h3>
-            <p><span id="dot-2" class="status-dot green"></span> สถานะ: <span id="text-2">สะอาด</span></p>
-            <div class="equipment">
-                <p>✅ ถังน้ำ | ✅ ขันน้ำ | ✅ สายชำระ</p>
-            </div>
-            <div class="report-section">
-                <label>ระบุปัญหาที่พบ:</label>
-                <select id="issue-2">
-                    <option value="ความสะอาด/พื้นเปียก">ความสะอาด/พื้นเปียก</option>
-                    <option value="ถังน้ำ/ขันน้ำ">ถังน้ำ/ขันน้ำ (ชำรุด/ไม่มี)</option>
-                    <option value="สายชำระ">สายชำระ (รั่ว/พัง)</option>
-                    <option value="อื่นๆ">อื่นๆ (โปรดระบุข้างล่าง)</option>
-                </select>
-                <input type="text" id="desc-2" placeholder="ระบุรายละเอียดเพิ่มเติม...">
-                <button onclick="sendReport(2)">รายงานปัญหา</button>
-            </div>
         </div>
-
-        <div class="toilet-card">
-            <h3>ห้องน้ำ 3</h3>
-            <p><span id="dot-3" class="status-dot green"></span> สถานะ: <span id="text-3">สะอาด</span></p>
-            <div class="equipment">
-                <p>✅ ถังน้ำ | ✅ ขันน้ำ | ✅ สายชำระ</p>
-            </div>
-            <div class="report-section">
-                <label>ระบุปัญหาที่พบ:</label>
-                <select id="issue-3">
-                    <option value="ความสะอาด/พื้นเปียก">ความสะอาด/พื้นเปียก</option>
-                    <option value="ถังน้ำ/ขันน้ำ">ถังน้ำ/ขันน้ำ (ชำรุด/ไม่มี)</option>
-                    <option value="สายชำระ">สายชำระ (รั่ว/พัง)</option>
-                    <option value="อื่นๆ">อื่นๆ (โปรดระบุข้างล่าง)</option>
-                </select>
-                <input type="text" id="desc-3" placeholder="ระบุรายละเอียดเพิ่มเติม...">
-                <button onclick="sendReport(3)">รายงานปัญหา</button>
-            </div>
-        </div>
-
-    </div>
 
     <script>
-        // --- ส่วนที่ 1: ฟังก์ชันดึงสถานะจาก Python มาแสดงผล ---
+        // 1. นำ URL จาก ngrok มาใส่ที่นี่ (เปลี่ยนทุกครั้งที่เปิด ngrok ใหม่ถ้าใช้ตัวฟรี)
+        const BASE_URL = "https://your-ngrok-id.ngrok-free.app";
+
         function updateUI() {
-            fetch("http://127.0.0.1:5000/get_status")
-            .then(response => response.json())
+            fetch(`${BASE_URL}/get_status`)
+            .then(res => res.json())
             .then(data => {
-                // วนลูปเช็กทั้ง 3 ห้อง
                 for (let i = 1; i <= 3; i++) {
                     const dot = document.getElementById('dot-' + i);
                     const text = document.getElementById('text-' + i);
-                    
-                    // เปลี่ยนสีจุด (ลบสีเดิมออกก่อนแล้วใส่สีที่ได้จาก Python)
-                    dot.classList.remove('green', 'red');
-                    dot.classList.add(data[i].color);
-                    
-                    // เปลี่ยนข้อความสถานะ
-                    text.innerText = data[i].status;
+                    if(dot) {
+                        dot.className = "status-dot " + data[i].color;
+                        text.innerText = data[i].status;
+                    }
                 }
-            })
-            .catch(err => console.log("ยังไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้"));
+            }).catch(e => console.log("กำลังรอการเชื่อมต่อ..."));
         }
 
-        // สั่งให้ทำงานทันทีที่เปิดหน้าเว็บ
+        setInterval(updateUI, 5000);
         window.onload = updateUI;
 
-        // สั่งให้เช็กสถานะใหม่ทุกๆ 5 วินาที (เพื่อให้มือถือกับคอมซิงค์กันตลอด)
-        setInterval(updateUI, 5000);
-
-        // --- ส่วนที่ 2: ฟังก์ชันรายงานปัญหา ---
         function sendReport(roomNum) {
             const issue = document.getElementById('issue-' + roomNum).value;
             const note = document.getElementById('desc-' + roomNum).value;
-            
-            const url = "http://127.0.0.1:5000/report"; 
-            
-            fetch(url, {
+
+            fetch(`${BASE_URL}/report`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    room: roomNum,
-                    issue: issue,
-                    note: note
-                })
+                body: JSON.stringify({ room: roomNum, issue: issue, note: note })
             })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                if(data.status === "success") {
-                    alert("✅ " + data.message);
-                    updateUI(); // เมื่อส่งเสร็จให้รีเฟรชหน้าจอทันที
-                } else {
-                    alert("❌ ผิดพลาด: " + data.message);
-                }
+                alert("✅ " + data.message);
+                updateUI();
             })
-            .catch(error => {
-                alert("❌ ไม่สามารถเชื่อมต่อกับ Python Backend");
-            });
+            .catch(err => alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่"));
+        }
+
+        // ระบบ Login ง่ายๆ สำหรับเจ้าหน้าที่
+        function checkAdmin() {
+            const user = prompt("ชื่อผู้ใช้:");
+            const pass = prompt("รหัสผ่าน:");
+            if(user === "admin" && pass === "1234") {
+                window.location.href = "admin.html";
+            } else {
+                alert("ข้อมูลไม่ถูกต้อง!");
+            }
         }
     </script>
 </body>
