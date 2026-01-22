@@ -6,9 +6,9 @@ from linebot.models import TextSendMessage
 app = Flask(__name__)
 CORS(app) # อนุญาตให้หน้าเว็บส่งข้อมูลข้ามมาหา Python ได้
 
-# --- นำรหัสจาก LINE Developers มาวางตรงนี้ ---
-LINE_ACCESS_TOKEN = 'วาง_Channel_Access_Token_ของคุณที่นี่'
-YOUR_USER_ID = 'วาง_Your_user_ID_ของคุณที่นี่' 
+CHANNEL_SECRET = 'c7e12914aace4e7560247ba96453d752'
+LINE_ACCESS_TOKEN = '4osdkFfAQlp1ejc0f2FP7bUWPWJK87ilIuTK1CSgWzbMGZzM2050Lm4aEfN+YVjCjyu24VBP/qzzmb1FT/EMxsok+jHdo14Qc6SGUCjMxouWGE9Ql53LtSLDj8EX5y/5vcZ+dwEGNqp325quq+W67wdB04t89/1O/w1cDnyilFU='
+YOUR_USER_ID = 'Ue245f5522acbdea06115091b2958ab69'
 
 line_bot_api = LineBotApi(LINE_ACCESS_TOKEN)
 
