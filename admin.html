@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการห้องน้ำ - สำหรับเจ้าหน้าที่</title>
+    <style>
+        /* เน้นสีเข้มเพื่อให้แยกออกว่าเป็นหน้า Admin */
+        body { font-family: 'Segoe UI', sans-serif; background: #2c3e50; color: white; text-align: center; margin: 0; padding: 0; }
+        h1 { margin-top: 20px; font-size: 1.5rem; }
+        .container { display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 15px; }
+        
+        .admin-card { 
+            background: white; 
+            color: #333; 
+            border-radius: 15px; 
+            width: 100%; 
+            max-width: 400px; 
+            padding: 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-sizing: border-box;
+        }
+
+        .room-label { font-size: 1.4rem; font-weight: bold; margin-bottom: 15px; display: block; }
+        
+        /* ปุ่มยืนยันขนาดใหญ่ กดง่าย */
+        .btn-clear { 
+            background: #2ecc71; 
+            color: white; 
+            border: none; 
+            padding: 20px; 
+            width: 100%; 
+            border-radius: 10px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.3s;
+        }
+        .btn-clear:active { background: #27ae60; transform: scale(0.95); }
+    </style>
+</head>
+<body>
+    <h1>🧹 แผงควบคุมแม่บ้าน / เจ้าหน้าที่</h1>
+    <div class="container">
+        <div class="admin-card">
+            <span class="room-label">ห้องน้ำ 1</span>
+            <button class="btn-clear" onclick="resetRoom(1)">✅ ทำความสะอาดเสร็จแล้ว</button>
+        </div>
+
+        <div class="admin-card">
+            <span class="room-label">ห้องน้ำ 2</span>
+            <button class="btn-clear" onclick="resetRoom(2)">✅ ทำความสะอาดเสร็จแล้ว</button>
+        </div>
+
+        <div class="admin-card">
+            <span class="room-label">ห้องน้ำ 3</span>
+            <button class="btn-clear" onclick="resetRoom(3)">✅ ทำความสะอาดเสร็จแล้ว</button>
+        </div>
+    </div>
+
+    <script>
+        function resetRoom(roomNum) {
+            // ส่งคำสั่งไปที่ Route /reset_status ใน Python ของคุณ
+            fetch("http://127.0.0.1:5000/reset_status", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ room: roomNum })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert("ห้องที่ " + roomNum + " กลับมาสะอาดแล้วครับ!");
+            })
+            .catch(err => alert("ไม่สามารถติดต่อเซิร์ฟเวอร์ได้ กรุณารันไฟล์ Python ด้วยครับ"));
+        }
+    </script>
+</body>
+</html>

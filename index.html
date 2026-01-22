@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจัดการห้องน้ำ</title>
+    <title>ระบบจัดการห้องน้ำ - แผนกไอที</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; text-align: center; margin: 0; padding: 0; }
         h1 { color: #2c3e50; margin-top: 20px; padding: 0 15px; font-size: 1.8rem; }
+        
         .container { 
             display: grid; 
             grid-template-columns: 1fr;
@@ -66,11 +67,9 @@
         @media (min-width: 600px) and (orientation: landscape) {
             .container { grid-template-columns: repeat(2, 1fr); }
         }
-
         @media (min-width: 768px) {
             .container { grid-template-columns: repeat(2, 1fr); }
         }
-
         @media (min-width: 1024px) {
             .container { grid-template-columns: repeat(3, 1fr); }
         }
@@ -89,7 +88,7 @@
             <div class="report-section">
                 <label>ระบุปัญหาที่พบ:</label>
                 <select id="issue-1">
-                    <option value="ความสะอาด">ความสะอาด/พื้นเปียก</option>
+                    <option value="ความสะอาด/พื้นเปียก">ความสะอาด/พื้นเปียก</option>
                     <option value="ถังน้ำ/ขันน้ำ">ถังน้ำ/ขันน้ำ (ชำรุด/ไม่มี)</option>
                     <option value="สายชำระ">สายชำระ (รั่ว/พัง)</option>
                     <option value="อื่นๆ">อื่นๆ (โปรดระบุข้างล่าง)</option>
@@ -108,7 +107,7 @@
             <div class="report-section">
                 <label>ระบุปัญหาที่พบ:</label>
                 <select id="issue-2">
-                    <option value="ความสะอาด">ความสะอาด/พื้นเปียก</option>
+                    <option value="ความสะอาด/พื้นเปียก">ความสะอาด/พื้นเปียก</option>
                     <option value="ถังน้ำ/ขันน้ำ">ถังน้ำ/ขันน้ำ (ชำรุด/ไม่มี)</option>
                     <option value="สายชำระ">สายชำระ (รั่ว/พัง)</option>
                     <option value="อื่นๆ">อื่นๆ (โปรดระบุข้างล่าง)</option>
@@ -127,7 +126,7 @@
             <div class="report-section">
                 <label>ระบุปัญหาที่พบ:</label>
                 <select id="issue-3">
-                    <option value="ความสะอาด">ความสะอาด/พื้นเปียก</option>
+                    <option value="ความสะอาด/พื้นเปียก">ความสะอาด/พื้นเปียก</option>
                     <option value="ถังน้ำ/ขันน้ำ">ถังน้ำ/ขันน้ำ (ชำรุด/ไม่มี)</option>
                     <option value="สายชำระ">สายชำระ (รั่ว/พัง)</option>
                     <option value="อื่นๆ">อื่นๆ (โปรดระบุข้างล่าง)</option>
@@ -140,6 +139,34 @@
     </div>
 
     <script>
+        // --- ส่วนที่ 1: ฟังก์ชันดึงสถานะจาก Python มาแสดงผล ---
+        function updateUI() {
+            fetch("http://127.0.0.1:5000/get_status")
+            .then(response => response.json())
+            .then(data => {
+                // วนลูปเช็กทั้ง 3 ห้อง
+                for (let i = 1; i <= 3; i++) {
+                    const dot = document.getElementById('dot-' + i);
+                    const text = document.getElementById('text-' + i);
+                    
+                    // เปลี่ยนสีจุด (ลบสีเดิมออกก่อนแล้วใส่สีที่ได้จาก Python)
+                    dot.classList.remove('green', 'red');
+                    dot.classList.add(data[i].color);
+                    
+                    // เปลี่ยนข้อความสถานะ
+                    text.innerText = data[i].status;
+                }
+            })
+            .catch(err => console.log("ยังไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้"));
+        }
+
+        // สั่งให้ทำงานทันทีที่เปิดหน้าเว็บ
+        window.onload = updateUI;
+
+        // สั่งให้เช็กสถานะใหม่ทุกๆ 5 วินาที (เพื่อให้มือถือกับคอมซิงค์กันตลอด)
+        setInterval(updateUI, 5000);
+
+        // --- ส่วนที่ 2: ฟังก์ชันรายงานปัญหา ---
         function sendReport(roomNum) {
             const issue = document.getElementById('issue-' + roomNum).value;
             const note = document.getElementById('desc-' + roomNum).value;
@@ -159,19 +186,7 @@
             .then(data => {
                 if(data.status === "success") {
                     alert("✅ " + data.message);
-
-                    // --- ส่วนที่เพิ่มเข้ามา: เปลี่ยนสถานะบนหน้าเว็บทันที ---
-                    if (issue === "ความสะอาด") {
-                        const dot = document.getElementById('dot-' + roomNum);
-                        const statusText = document.getElementById('text-' + roomNum);
-                        
-                        // เปลี่ยนสีจุดจาก green เป็น red
-                        dot.classList.remove('green');
-                        dot.classList.add('red');
-                        
-                        // เปลี่ยนคำว่า "สะอาด" เป็น "ไม่สะอาด"
-                        statusText.innerText = "ไม่สะอาด";
-                    }
+                    updateUI(); // เมื่อส่งเสร็จให้รีเฟรชหน้าจอทันที
                 } else {
                     alert("❌ ผิดพลาด: " + data.message);
                 }
