@@ -3,29 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจัดการห้องน้ำ - วิทยาลัยเทคนิคยะลา</title>
+    <title>ระบบจัดการห้องน้ำ</title>
     <style>
-        /* สไตล์เดิมของคุณ */
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; text-align: center; margin: 0; padding: 0; }
-        h1 { color: #2c3e50; margin-top: 20px; padding: 0 15px; font-size: 1.8rem; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; text-align: center; margin: 0; padding: 0; position: relative; }
+        h1 { color: #2c3e50; margin-top: 40px; padding: 0 15px; font-size: 1.8rem; }
         
-        /* ปุ่ม Login Admin มุมขวาบน */
-        .admin-btn {
-            position: absolute; top: 10px; right: 10px;
-            background: #95a5a6; color: white; border: none;
-            padding: 8px 12px; border-radius: 5px; cursor: pointer;
-            font-size: 0.8rem; font-weight: bold;
+        /* --- ปุ่ม Login เจ้าหน้าที่ --- */
+        .admin-login-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #95a5a6;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
         }
 
         .container { 
-            display: grid; grid-template-columns: 1fr;
-            gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto;
+            display: grid; 
+            grid-template-columns: 1fr;
+            justify-content: center; 
+            gap: 20px; 
+            padding: 20px; 
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .toilet-card { 
-            background: white; border-radius: 15px; width: 100%; 
-            padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-            margin-bottom: 10px; box-sizing: border-box;
+            background: white; 
+            border-radius: 15px; 
+            width: 100%; 
+            padding: 20px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            transition: transform 0.2s;
         }
         
         .status-dot { height: 15px; width: 15px; border-radius: 50%; display: inline-block; margin-right: 5px; }
@@ -33,84 +49,151 @@
         .red { background-color: #e74c3c; }
         
         .equipment { text-align: left; font-size: 0.9em; color: #555; margin-bottom: 15px; background: #fdfdfd; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
-        .report-section { border-top: 1px solid #eee; padding-top: 15px; text-align: left; }
         
-        select, input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button.send-btn { background: #3498db; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .report-section { border-top: 1px solid #eee; padding-top: 15px; text-align: left; }
+        label { font-weight: bold; font-size: 0.85em; color: #34495e; }
+        
+        select, input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 8px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 16px; 
+        }
+        
+        button.main-btn { 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            width: 100%; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            margin-top: 10px; 
+            font-weight: bold; 
+            font-size: 1rem;
+        }
+        button.main-btn:hover { background: #2980b9; }
 
-        /* Responsive Grid */
+        /* --- Responsive Design --- */
         @media (min-width: 768px) { .container { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 1024px) { .container { grid-template-columns: repeat(3, 1fr); } }
     </style>
 </head>
 <body>
-    <button class="admin-btn" onclick="checkAdmin()">สำหรับเจ้าหน้าที่ 🔑</button>
+
+    <button class="admin-login-btn" onclick="adminLogin()">สำหรับเจ้าหน้าที่ 🔑</button>
 
     <h1>🚽 ระบบจัดการห้องน้ำ</h1>
-    
+
     <div class="container">
         <div class="toilet-card">
             <h3>ห้องน้ำ 1</h3>
             <p><span id="dot-1" class="status-dot green"></span> สถานะ: <span id="text-1">สะอาด</span></p>
-            <div class="equipment">✅ ถังน้ำ | ✅ ขันน้ำ | ✅ สายชำระ</div>
+            <div class="equipment"><p>✅ ถังน้ำ | ✅ ขันน้ำ | ✅ สายชำระ</p></div>
             <div class="report-section">
+                <label>ระบุปัญหาที่พบ:</label>
                 <select id="issue-1">
                     <option value="ความสะอาด/พื้นเปียก">ความสะอาด/พื้นเปียก</option>
-                    <option value="ถังน้ำ/ขันน้ำ">ถังน้ำ/ขันน้ำ</option>
+                    <option value="ถังน้ำ/ขันน้ำ">ถังน้ำ/ขันน้ำ (ชำรุด/ไม่มี)</option>
+                    <option value="สายชำระ">สายชำระ (รั่ว/พัง)</option>
                     <option value="อื่นๆ">อื่นๆ</option>
                 </select>
-                <input type="text" id="desc-1" placeholder="เพิ่มเติม...">
-                <button class="send-btn" onclick="sendReport(1)">รายงานปัญหา</button>
+                <input type="text" id="desc-1" placeholder="ระบุรายละเอียดเพิ่มเติม...">
+                <button class="main-btn" onclick="sendReport(1)">รายงานปัญหา</button>
             </div>
         </div>
+
+        <div class="toilet-card">
+            <h3>ห้องน้ำ 2</h3>
+            <p><span id="dot-2" class="status-dot green"></span> สถานะ: <span id="text-2">สะอาด</span></p>
+            <div class="equipment"><p>✅ ถังน้ำ | ✅ ขันน้ำ | ✅ สายชำระ</p></div>
+            <div class="report-section">
+                <label>ระบุปัญหาที่พบ:</label>
+                <select id="issue-2">
+                    <option value="ความสะอาด/พื้นเปียก">ความสะอาด/พื้นเปียก</option>
+                    <option value="ถังน้ำ/ขันน้ำ">ถังน้ำ/ขันน้ำ (ชำรุด/ไม่มี)</option>
+                    <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+                <input type="text" id="desc-2" placeholder="ระบุรายละเอียดเพิ่มเติม...">
+                <button class="main-btn" onclick="sendReport(2)">รายงานปัญหา</button>
+            </div>
         </div>
 
+        <div class="toilet-card">
+            <h3>ห้องน้ำ 3</h3>
+            <p><span id="dot-3" class="status-dot green"></span> สถานะ: <span id="text-3">สะอาด</span></p>
+            <div class="equipment"><p>✅ ถังน้ำ | ✅ ขันน้ำ | ✅ สายชำระ</p></div>
+            <div class="report-section">
+                <label>ระบุปัญหาที่พบ:</label>
+                <select id="issue-3">
+                    <option value="ความสะอาด/พื้นเปียก">ความสะอาด/พื้นเปียก</option>
+                    <option value="ถังน้ำ/ขันน้ำ">ถังน้ำ/ขันน้ำ (ชำรุด/ไม่มี)</option>
+                    <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+                <input type="text" id="desc-3" placeholder="ระบุรายละเอียดเพิ่มเติม...">
+                <button class="main-btn" onclick="sendReport(3)">รายงานปัญหา</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // 1. นำ URL จาก ngrok มาใส่ที่นี่ (เปลี่ยนทุกครั้งที่เปิด ngrok ใหม่ถ้าใช้ตัวฟรี)
-        const BASE_URL = "https://your-ngrok-id.ngrok-free.app";
+        // --- ส่วนการตั้งค่า URL ---
+        // เมื่อรัน ngrok แล้ว ให้นำ URL ที่ได้ (https://xxx.ngrok-free.app) มาใส่ที่นี่
+        const BASE_URL = "http://127.0.0.1:5000"; 
 
         function updateUI() {
             fetch(`${BASE_URL}/get_status`)
-            .then(res => res.json())
+            .then(response => response.json())
             .then(data => {
                 for (let i = 1; i <= 3; i++) {
                     const dot = document.getElementById('dot-' + i);
                     const text = document.getElementById('text-' + i);
-                    if(dot) {
+                    if (dot && text) {
                         dot.className = "status-dot " + data[i].color;
                         text.innerText = data[i].status;
                     }
                 }
-            }).catch(e => console.log("กำลังรอการเชื่อมต่อ..."));
+            })
+            .catch(err => console.log("กำลังรอการเชื่อมต่อจาก Server..."));
         }
 
-        setInterval(updateUI, 5000);
         window.onload = updateUI;
+        setInterval(updateUI, 5000);
 
         function sendReport(roomNum) {
             const issue = document.getElementById('issue-' + roomNum).value;
             const note = document.getElementById('desc-' + roomNum).value;
-
+            
             fetch(`${BASE_URL}/report`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ room: roomNum, issue: issue, note: note })
             })
-            .then(res => res.json())
+            .then(response => response.json())
             .then(data => {
-                alert("✅ " + data.message);
-                updateUI();
+                if(data.status === "success") {
+                    alert("✅ " + data.message);
+                    updateUI();
+                } else {
+                    alert("❌ ผิดพลาด: " + data.message);
+                }
             })
-            .catch(err => alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่"));
+            .catch(error => {
+                alert("❌ ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่ภายหลัง");
+            });
         }
 
-        // ระบบ Login ง่ายๆ สำหรับเจ้าหน้าที่
-        function checkAdmin() {
-            const user = prompt("ชื่อผู้ใช้:");
-            const pass = prompt("รหัสผ่าน:");
-            if(user === "admin" && pass === "1234") {
+        // --- ระบบ Login เจ้าหน้าที่ ---
+        function adminLogin() {
+            const user = prompt("กรุณาใส่ชื่อผู้ใช้งาน:");
+            const pass = prompt("กรุณาใส่รหัสผ่าน:");
+
+            if (user === "admin" && pass === "1234") {
                 window.location.href = "admin.html";
-            } else {
+            } else if (user !== null) { // ป้องกัน alert โชว์ถ้ากด Cancel
                 alert("ข้อมูลไม่ถูกต้อง!");
             }
         }
