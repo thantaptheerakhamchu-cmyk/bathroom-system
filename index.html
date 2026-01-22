@@ -3,26 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจัดการห้องน้ำ</title>
+    <title>ระบบจัดการห้องน้ำ - แผนกไอที</title>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; text-align: center; }
-        .container { display: flex; justify-content: center; gap: 20px; padding: 20px; flex-wrap: wrap; }
-        .toilet-card { background: white; border-radius: 15px; width: 280px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .status-dot { height: 15px; width: 15px; border-radius: 50%; display: inline-block; }
+        /* ส่วนเดิมที่คุณชอบ */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; text-align: center; margin: 0; padding: 0; }
+        h1 { color: #2c3e50; margin-top: 20px; padding: 0 15px; font-size: 1.8rem; }
+        
+        .container { 
+            display: flex; 
+            justify-content: center; 
+            gap: 20px; 
+            padding: 20px; 
+            flex-wrap: wrap; 
+        }
+
+        .toilet-card { 
+            background: white; 
+            border-radius: 15px; 
+            width: 300px; /* ขนาดมาตรฐานบนคอม */
+            padding: 20px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            transition: transform 0.2s;
+        }
+        
+        .status-dot { height: 15px; width: 15px; border-radius: 50%; display: inline-block; margin-right: 5px; }
         .green { background-color: #2ecc71; }
         .red { background-color: #e74c3c; }
-        .equipment { text-align: left; font-size: 0.9em; color: #555; margin-bottom: 15px; }
-        h1 { color: #2c3e50; }
         
-        /* สไตล์ส่วนตัวเลือก */
-        .report-section { border-top: 1px solid #eee; pt: 15px; text-align: left; }
-        select, input { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { background: #3498db; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+        .equipment { text-align: left; font-size: 0.9em; color: #555; margin-bottom: 15px; background: #fdfdfd; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
+        
+        .report-section { border-top: 1px solid #eee; padding-top: 15px; text-align: left; }
+        label { font-weight: bold; font-size: 0.85em; color: #34495e; }
+        
+        /* ปรับขนาดช่องกรอกให้กดง่ายขึ้น */
+        select, input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 8px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 16px; /* ป้องกัน iOS ซูมจอเวลาพิมพ์ */
+        }
+        
+        button { 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            width: 100%; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            margin-top: 10px; 
+            font-weight: bold; 
+            font-size: 1rem;
+        }
         button:hover { background: #2980b9; }
+        button:active { transform: scale(0.98); }
+
+        /* --- ส่วนที่เพิ่มเพื่อรองรับมือถือ (Responsive) --- */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.4rem; }
+            .container { 
+                flex-direction: column; /* เรียงเป็นแนวตั้ง */
+                align-items: center; 
+                padding: 10px;
+            }
+            .toilet-card { 
+                width: 100%; /* เต็มความกว้างมือถือ */
+                max-width: 380px; 
+                margin-bottom: 15px;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>🚽 ระบบจัดการห้องน้ำ</h1>
+    <h1>🚽 ระบบจัดการห้องน้ำแผนก</h1>
     <div class="container">
         
         <div class="toilet-card">
@@ -86,45 +144,33 @@
 
     <script>
         function sendReport(roomNum) {
-            var issue = document.getElementById('issue-' + roomNum).value;
-            var note = document.getElementById('desc-' + roomNum).value;
+            const issue = document.getElementById('issue-' + roomNum).value;
+            const note = document.getElementById('desc-' + roomNum).value;
             
-            var message = "--- รายงานใหม่ ---\n" +
-                          "ห้อง: " + roomNum + "\n" +
-                          "ปัญหา: " + issue;
+            // เชื่อมต่อไปยัง Python Backend ในเครื่องคุณ
+            const url = "http://127.0.0.1:5000/report"; 
             
-            if(note) { message += "\nรายละเอียด: " + note; }
-            
-            alert(message + "\n\nระบบกำลังส่งข้อมูลไปยัง แม่บ้าน...");
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    room: roomNum,
+                    issue: issue,
+                    note: note
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "success") {
+                    alert("✅ " + data.message);
+                } else {
+                    alert("❌ ผิดพลาด: " + data.message);
+                }
+            })
+            .catch(error => {
+                alert("❌ ไม่สามารถเชื่อมต่อกับ Python Backend ได้ (อย่าลืมรันไฟล์ app.py นะครับ)");
+            });
         }
-        function sendReport(roomNum) {
-    const issue = document.getElementById('issue-' + roomNum).value;
-    const note = document.getElementById('desc-' + roomNum).value;
-    
-    // ชี้เป้าไปที่เครื่องตัวเอง (Localhost)
-    const url = "http://127.0.0.1:5000/report"; 
-    
-    fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            room: roomNum,
-            issue: issue,
-            note: note
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.status === "success") {
-            alert("✅ " + data.message);
-        } else {
-            alert("❌ ผิดพลาด: " + data.message);
-        }
-    })
-    .catch(error => {
-        alert("❌ ไม่สามารถเชื่อมต่อกับ Python Backend ได้ (อย่าลืมรันไฟล์ app.py นะครับ)");
-    });
-}
     </script>
 </body>
 </html>
