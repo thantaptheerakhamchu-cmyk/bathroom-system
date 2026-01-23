@@ -1,0 +1,21 @@
+chanel secret 5aa27f0297016a1c747b6e36f3d395fa
+access token YXURNM6OycB38H4910Op/8XbQXM1DXk2WH79awHr24mzilhUpl8dr0G8+ju9ezY+jyu24VBP/qzzmb1FT/EMxsok+jHdo14Qc6SGUCjMxouYWwwH8ICECC/Of7zaqaanbpQ+yAWek4NshzRi5KZopAdB04t89/1O/w1cDnyilFU=
+
+user id Ue245f5522acbdea06115091b2958ab69
+group id C389d99ed8e9e1d831e466b99d8fd6071
+
+libraly ที่ต้องลงในหน้า terminal
+pip install flask flask-cors line-bot-sdk python-dotenv
+
+หากมีแล้วไม่ต้องแก้ไข
+แก้ไข HTML: นำลิงก์ https://tearable-solomon-exalted.ngrok-free.dev อันใหม่ที่เพิ่งได้ ไปแปะใน BASE_URL ของทั้งไฟล์ index.html และ admin.html
+
+
+
+
+Authtoken เอามาจากเว็บ ngrok
+./ngrok config add-authtoken 38bABY1qUfrddYKPPw7mzyo0VM9_7pPg4NBZKyY9GtEWr6LcK
+
+ก่อนเปิดระบบใช้คำสั่งนี้
+./ngrok http 5000
+python bathroom_logic.py
