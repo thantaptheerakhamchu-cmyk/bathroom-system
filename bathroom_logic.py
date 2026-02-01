@@ -163,5 +163,26 @@ def add_room():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+@app.route('/delete_room', methods=['POST'])
+def delete_room():
+    """[D - Delete] ลบห้องน้ำออกจากระบบ"""
+    try:
+        data = request.json
+        room_id = str(data.get('room_id'))
+        
+        with sqlite3.connect(DB_NAME) as conn:
+            cursor = conn.cursor()
+            # เช็กก่อนว่ามีห้องนี้ไหม
+            cursor.execute("SELECT room_id FROM rooms WHERE room_id=?", (room_id,))
+            if not cursor.fetchone():
+                return jsonify({"status": "error", "message": f"ไม่พบห้องที่ {room_id} ในระบบ"}), 404
+            
+            # สั่งลบแถว (Row) นั้นทิ้ง
+            cursor.execute("DELETE FROM rooms WHERE room_id=?", (room_id,))
+            conn.commit()
+            
+        return jsonify({"status": "success", "message": f"ลบห้องที่ {room_id} ออกจากระบบเรียบร้อย!"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
