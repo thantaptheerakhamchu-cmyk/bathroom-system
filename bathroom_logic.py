@@ -1,6 +1,6 @@
 import os
 import time
-import sqlite3 # [เพิ่ม] สำหรับจัดการฐานข้อมูล
+import sqlite3
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from linebot import LineBotApi
@@ -28,7 +28,6 @@ def init_db():
     """ฟังก์ชันสร้างไฟล์ฐานข้อมูลและตารางเริ่มต้น"""
     with sqlite3.connect(DB_NAME) as conn:
         cursor = conn.cursor()
-        # สร้างตารางชื่อ rooms
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS rooms (
                 room_id TEXT PRIMARY KEY,
@@ -36,7 +35,6 @@ def init_db():
                 color TEXT
             )
         ''')
-        # ตรวจสอบว่ามีข้อมูลหรือยัง ถ้าไม่มีให้เพิ่มห้อง 1-5 เข้าไป
         cursor.execute('SELECT count(*) FROM rooms')
         if cursor.fetchone()[0] == 0:
             initial_data = [
@@ -50,11 +48,9 @@ def init_db():
             conn.commit()
             print("--- สร้าง Database 'bathroom.db' และข้อมูลเริ่มต้นสำเร็จ! ---")
 
-# สั่งให้ฐานข้อมูลเริ่มทำงานทันที
 init_db()
 
 def get_rooms_from_db():
-    """ฟังก์ชันดึงข้อมูลจาก DB มาแปลงเป็น Dictionary เพื่อส่งให้หน้าเว็บ"""
     rooms_data = {}
     with sqlite3.connect(DB_NAME) as conn:
         conn.row_factory = sqlite3.Row
@@ -72,16 +68,15 @@ def get_rooms_from_db():
 last_report_times = {} 
 COOLDOWN_SECONDS = 60 
 
-# --- ส่วนที่ 3: ช่องทางดึงสถานะไปแสดงผล ---
+# --- ส่วนที่ 3: API สำหรับดึงข้อมูลและรายงาน ---
+
 @app.route('/get_status', methods=['GET'])
 def get_status():
-    # ดึงข้อมูลล่าสุดจาก SQLite ส่งกลับไปที่หน้าเว็บ
     return jsonify(get_rooms_from_db())
 
 @app.route('/report', methods=['POST'])
 def handle_report():
     try:
-        # [ด่านที่ 1] เช็กสแปม
         user_ip = request.remote_addr 
         current_time = time.time() 
 
@@ -96,13 +91,11 @@ def handle_report():
 
         last_report_times[user_ip] = current_time
 
-        # [ด่านที่ 2] จัดการข้อมูล
         data = request.json
         room = str(data.get('room'))
         issue = data.get('issue')
         note = data.get('note', '-')
 
-        # อัปเดตสถานะลงใน SQLite (ถ้าเป็นเรื่องความสะอาด)
         if issue == "ความสะอาด/พื้นเปียก":
             with sqlite3.connect(DB_NAME) as conn:
                 cursor = conn.cursor()
@@ -110,7 +103,6 @@ def handle_report():
                              ('ไม่สะอาด', 'red', room))
                 conn.commit()
 
-        # [ด่านที่ 3] ส่งแจ้งเตือนเข้า LINE
         current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M")
         message_text = (
             f"📢 [แจ้งซ่อม/ทำความสะอาด]\n"
@@ -127,14 +119,15 @@ def handle_report():
         print(f"Error: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# --- ส่วนที่ 4: ช่องทางสำหรับ Admin เพื่อล้างสถานะ ---
+# --- ส่วนที่ 4: ฟังก์ชัน CRUD เพิ่มเติม (Create & Update) ---
+
 @app.route('/reset_status', methods=['POST'])
 def reset_status():
+    """[U - Update] รีเซ็ตสถานะห้องกลับเป็นปกติ"""
     try:
         data = request.json
         room = str(data.get('room'))
         
-        # รีเซ็ตสถานะใน SQLite ให้กลับเป็นสะอาด (สีเขียว)
         with sqlite3.connect(DB_NAME) as conn:
             cursor = conn.cursor()
             cursor.execute("UPDATE rooms SET status=?, color=? WHERE room_id=?", 
@@ -142,6 +135,31 @@ def reset_status():
             conn.commit()
             
         return jsonify({"status": "success", "message": f"ห้องที่ {room} กลับมาสะอาดแล้ว!"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/add_room', methods=['POST'])
+def add_room():
+    """[C - Create] เพิ่มห้องน้ำใหม่เข้าสู่ระบบ"""
+    try:
+        data = request.json
+        room_id = str(data.get('room_id'))
+        
+        if not room_id:
+            return jsonify({"status": "error", "message": "กรุณาระบุเลขห้อง"}), 400
+
+        with sqlite3.connect(DB_NAME) as conn:
+            cursor = conn.cursor()
+            # ตรวจสอบก่อนว่ามีห้องนี้อยู่แล้วหรือไม่
+            cursor.execute("SELECT room_id FROM rooms WHERE room_id=?", (room_id,))
+            if cursor.fetchone():
+                return jsonify({"status": "error", "message": f"ห้องที่ {room_id} มีอยู่ในระบบแล้ว"}), 400
+            
+            # เพิ่มห้องใหม่สถานะเริ่มต้นคือสะอาด (สีเขียว)
+            cursor.execute("INSERT INTO rooms (room_id, status, color) VALUES (?, 'สะอาด', 'green')", (room_id,))
+            conn.commit()
+            
+        return jsonify({"status": "success", "message": f"เพิ่มห้องที่ {room_id} เข้าสู่ระบบสำเร็จ!"}), 201
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
